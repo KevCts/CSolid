@@ -1,0 +1,3 @@
+[submodule "lib/cvide"]
+	path = lib/cvide
+	url = git@github.com:KevCts/CVide.git
