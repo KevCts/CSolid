@@ -9,10 +9,14 @@ add_subdirectory(lib/cvide)
 set(SRCS
 	main.c
     model.c
+    node.c
+    element.c
 )
 
 set(HEADERS
     model.h
+    node.h
+    element.h
 )
 
 add_executable(CSolid ${SRCS} ${HEADERS})
