@@ -11,12 +11,18 @@ set(SRCS
     model.c
     node.c
     element.c
+    section.c
+    material.c
+    elements/bar.c
 )
 
 set(HEADERS
     model.h
     node.h
     element.h
+    section.h
+    material.h
+    elements/bar.h
 )
 
 add_executable(CSolid ${SRCS} ${HEADERS})

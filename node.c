@@ -3,9 +3,10 @@
 
 void add_node(double x, double y, double z) {
     if (model.nodes_count + 1 > model.nodes_capacity) {
-        model.nodes = realloc(model.nodes, (++model.nodes_capacity) * sizeof(Node));
+        model.nodes = realloc(model.nodes, (++model.nodes_capacity) * sizeof(node));
     }
 
+    model.nodes[model.nodes_count].id = model.nodes_count;
     model.nodes[model.nodes_count].x = x;
     model.nodes[model.nodes_count].y = y;
     model.nodes[model.nodes_count++].z = z;
@@ -27,27 +28,25 @@ void list_nodes() {
 
 void replace_node(size_t i, size_t j) {
     if(i < model.nodes_count && j < model.nodes_count) {
+        node* n_old = model.nodes + i;
+        node* n_new = model.nodes + j;
+
         for (size_t k = 0; k < model.elements_count; k++) {
-            if(model.elements[k].n1 == j)
-                model.elements[k].n1 = i;
-            if(model.elements[k].n2 == j)
-                model.elements[k].n2 = i;
-            if (model.elements[k].n1 == model.elements[k].n2)
-                delete_element(k);
+            element_replace_node(model.elements + k, n_old, n_new);
         }
 
         model.nodes[i] = model.nodes[j];
+        model.nodes[i].id = i;
     }
 }
 
 void delete_node(size_t i) {
     if(i < model.nodes_count) {
-        for (size_t k = 0; k < model.elements_count; k++) {
-            if(model.elements[k].n1 == i || model.elements[k].n2 == i) {
-                delete_element(k);
-            }
-        }
         replace_node(i, model.nodes_count - 1);
         model.nodes_count--;
     }
+}
+
+double distance(node* a, node* b) {
+    return ((a->x - b->x) * (a->x - b->x)) + ((a->y - b->y) * (a->y - b->y)) + ((a->z - b->z) * (a->z - b->z));
 }

@@ -10,9 +10,13 @@
 typedef struct {
     coomat *m, *c, *k;
     size_t nodes_count, nodes_capacity;
-    Node* nodes;
+    node* nodes;
     size_t elements_count, elements_capacity;
-    Element* elements;
+    element* elements;
+    size_t sections_count, sections_capacity;
+    section* sections;
+    size_t materials_count, materials_capacity;
+    material* materials;
 } Model;
 
 extern Model model;
