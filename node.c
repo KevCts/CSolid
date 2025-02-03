@@ -1,15 +1,31 @@
+#include "node.h"
 #include "model.h"
 
 
 void add_node(double x, double y, double z) {
     if (model.nodes_count + 1 > model.nodes_capacity) {
         model.nodes = realloc(model.nodes, (++model.nodes_capacity) * sizeof(node));
+        model.nodes = realloc(model.forces, (++model.nodes_capacity) * sizeof(double));
+        model.nodes = realloc(model.boundaries, (model.nodes_capacity) * 6 * sizeof(boundary));
     }
 
     model.nodes[model.nodes_count].id = model.nodes_count;
     model.nodes[model.nodes_count].x = x;
     model.nodes[model.nodes_count].y = y;
     model.nodes[model.nodes_count++].z = z;
+}
+
+void add_boundary(size_t i, direction dir, double value) {
+    if (i < model.nodes_count) {
+        model.boundaries[6 * i + dir].is_set = true;
+        model.boundaries[6 * i + dir].value = value;
+    }
+}
+
+void add_force(size_t i, direction dir, double value) {
+    if (i < model.nodes_count) {
+        model.forces[6 * i + dir] = value;
+    }
 }
 
 void edit_node(size_t i, double x, double y, double z) {

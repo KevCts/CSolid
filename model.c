@@ -10,6 +10,8 @@ void init_model() {
     model.k = NULL;
 
     model.nodes = NULL;
+    model.boundaries = NULL;
+    model.forces = NULL;
     model.nodes_count = 0;
     model.nodes_capacity = 0;
 
@@ -30,6 +32,8 @@ void init_model() {
 void free_model() {
     if (model.nodes != NULL) {
         free(model.nodes);
+        free(model.forces);
+        free(model.boundaries);
     }
 
     if (model.elements != NULL) {

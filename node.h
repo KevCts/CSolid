@@ -9,8 +9,18 @@ typedef struct {
     double x, y, z;
 } node;
 
+typedef enum {
+    UX,
+    UY,
+    UZ,
+    RX,
+    RY,
+    RZ
+} direction;
 
 void add_node(double, double, double);
+
+void add_boundary(size_t i, direction dir, double value);
 
 void edit_node(size_t, double, double, double);
 

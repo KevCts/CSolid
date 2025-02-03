@@ -8,9 +8,16 @@
 #include <stddef.h>
 
 typedef struct {
+    bool is_set;
+    double value;
+} boundary;
+
+typedef struct {
     coomat *m, *c, *k;
     size_t nodes_count, nodes_capacity;
     node* nodes;
+    boundary* boundaries;
+    double* forces;
     size_t elements_count, elements_capacity;
     element* elements;
     size_t sections_count, sections_capacity;
