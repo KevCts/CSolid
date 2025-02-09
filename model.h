@@ -13,11 +13,10 @@ typedef struct {
 } boundary;
 
 typedef struct {
-    coomat *m, *c, *k;
     size_t nodes_count, nodes_capacity;
     node* nodes;
     boundary* boundaries;
-    double* forces;
+    double *forces, *reactions, *displacements;
     size_t elements_count, elements_capacity;
     element* elements;
     size_t sections_count, sections_capacity;
@@ -29,6 +28,8 @@ typedef struct {
 extern Model model;
 
 void init_model();
+coomat* build_stiffness();
+void solve();
 void free_model();
 
 #endif

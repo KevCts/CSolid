@@ -1,4 +1,5 @@
 #include "elements/bar.h"
+#include "lib/cvide/coomat.h"
 #include "model.h"
 
 void add_element(element e){

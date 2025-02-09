@@ -1,18 +1,27 @@
 #include "node.h"
 #include "model.h"
+#include <math.h>
+#include <stdio.h>
 
 
 void add_node(double x, double y, double z) {
     if (model.nodes_count + 1 > model.nodes_capacity) {
         model.nodes = realloc(model.nodes, (++model.nodes_capacity) * sizeof(node));
-        model.nodes = realloc(model.forces, (++model.nodes_capacity) * sizeof(double));
-        model.nodes = realloc(model.boundaries, (model.nodes_capacity) * 6 * sizeof(boundary));
+        model.forces = realloc(model.forces, (model.nodes_capacity) * 6 * sizeof(double));
+        model.displacements = realloc(model.displacements, (model.nodes_capacity) * 6 * sizeof(double));
+        model.boundaries = realloc(model.boundaries, (model.nodes_capacity) * 6 * sizeof(boundary));
     }
 
     model.nodes[model.nodes_count].id = model.nodes_count;
     model.nodes[model.nodes_count].x = x;
     model.nodes[model.nodes_count].y = y;
-    model.nodes[model.nodes_count++].z = z;
+    model.nodes[model.nodes_count].z = z;
+    for(int i = 0; i < 6; i++){
+        model.boundaries[model.nodes_count + i].is_set = false;
+        model.boundaries[model.nodes_count + i].value = 0;
+        model.forces[model.nodes_count + i] = 0;
+    }
+    model.nodes_count++;
 }
 
 void add_boundary(size_t i, direction dir, double value) {
@@ -64,5 +73,5 @@ void delete_node(size_t i) {
 }
 
 double distance(node* a, node* b) {
-    return ((a->x - b->x) * (a->x - b->x)) + ((a->y - b->y) * (a->y - b->y)) + ((a->z - b->z) * (a->z - b->z));
+    return sqrt(((a->x - b->x) * (a->x - b->x)) + ((a->y - b->y) * (a->y - b->y)) + ((a->z - b->z) * (a->z - b->z)));
 }

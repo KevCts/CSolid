@@ -16,31 +16,27 @@ bar* create_bar(node* n1, node* n2, section* s, material* m) {
 }
 
 coomat* bar_stiffness_matrix(bar* b){
-    // Define the traction/compression stiffness
     double h = b->mat->Ex * b->sec->A / distance(b->n1, b->n2);
-    // Define 1D stiffness matrix
     coomat* res1D = init_coomat(2, 2);
     coomat_set_value(res1D, 0, 0, h);
     coomat_set_value(res1D, 1, 0, -h);
     coomat_set_value(res1D, 0, 1, -h);
     coomat_set_value(res1D, 1, 1, h);
-    // Build 1D->3D transition matrix
     coomat* transiMat = init_coomat(12, 2);
     coomat_set_value(transiMat, 0, 0, (b->n2->x - b->n1->x)/distance(b->n1, b->n2));
-    coomat_set_value(transiMat, 0, 1, (b->n2->y - b->n1->y)/distance(b->n1, b->n2));
-    coomat_set_value(transiMat, 0, 2, (b->n2->z - b->n1->z)/distance(b->n1, b->n2));
-    coomat_set_value(transiMat, 1, 6, (b->n2->x - b->n1->x)/distance(b->n1, b->n2));
-    coomat_set_value(transiMat, 1, 7, (b->n2->y - b->n1->y)/distance(b->n1, b->n2));
-    coomat_set_value(transiMat, 1, 8, (b->n2->z - b->n1->z)/distance(b->n1, b->n2));
-    // 1D->3D transition
+    coomat_set_value(transiMat, 1, 0, (b->n2->y - b->n1->y)/distance(b->n1, b->n2));
+    coomat_set_value(transiMat, 2, 0, (b->n2->z - b->n1->z)/distance(b->n1, b->n2));
+    coomat_set_value(transiMat, 6, 1, (b->n2->x - b->n1->x)/distance(b->n1, b->n2));
+    coomat_set_value(transiMat, 7, 1, (b->n2->y - b->n1->y)/distance(b->n1, b->n2));
+    coomat_set_value(transiMat, 8, 1, (b->n2->z - b->n1->z)/distance(b->n1, b->n2));
     coomat* res3D = prod_coomat(prod_coomat(copy_coomat(transiMat), res1D), transpose_coomat(transiMat));
     coomat* res = init_coomat(model.nodes_count * 6, model.nodes_count * 6);
     for(size_t i = 0; i < 6; i++) {
         for(size_t j = 0; j < 6; j++) {
-            coomat_set_value(res, 3 * b->n1->id + i, 3 * b->n1->id + j, coomat_read_value(res3D, i, j));
-            coomat_set_value(res, 3 * b->n2->id + i, 3 * b->n1->id + j, coomat_read_value(res3D, i, j));
-            coomat_set_value(res, 3 * b->n1->id + i, 3 * b->n2->id + j, coomat_read_value(res3D, i, j));
-            coomat_set_value(res, 3 * b->n2->id + i, 3 * b->n2->id + j, coomat_read_value(res3D, i, j));
+            coomat_set_value(res, 6 * b->n1->id + i, 6 * b->n1->id + j, coomat_read_value(res3D, i, j));
+            coomat_set_value(res, 6 * b->n2->id + i, 6 * b->n1->id + j, coomat_read_value(res3D, 6 + i, j));
+            coomat_set_value(res, 6 * b->n1->id + i, 6 * b->n2->id + j, coomat_read_value(res3D, i, 6 + j));
+            coomat_set_value(res, 6 * b->n2->id + i, 6 * b->n2->id + j, coomat_read_value(res3D, 6 + i, 6 + j));
         }
     }
     free_coomat(res3D);
