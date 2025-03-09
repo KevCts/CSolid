@@ -2,7 +2,7 @@
 #define CSOLID_BAR_H
 
 #include <stddef.h>
-#include "../lib/cvide/coomat.h"
+#include "../../cvide/coomat.h"
 #include "../node.h"
 #include "../section.h"
 #include "../material.h"

@@ -1,7 +1,7 @@
 #ifndef CSOLID_ELEMENT_H
 #define CSOLID_ELEMENT_H
 
-#include "lib/cvide/coomat.h"
+#include "../cvide/coomat.h"
 #include "elements/bar.h"
 #include <stdlib.h>
 

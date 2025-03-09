@@ -1,10 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "lib/cvide/coomat.h"
-#include "model.h"
-#include "elements/bar.h"
-#include "node.h"
-#include "section.h"
+#include "lib/model/material.h"
+#include "lib/model/model.h"
+#include "lib/model/elements/bar.h"
+#include "lib/model/node.h"
+#include "lib/model/section.h"
 
 Model model;
 
@@ -15,9 +16,9 @@ int main(int argc, char* argv[]) {
     add_node(0, 1, 0);
     add_node(1, 0, 0);
 
-    add_material(210000);
+    set_material_caracteristic(0, EX, 210000);
 
-    add_section(1);
+    set_section_parameter(0, SEC, 1);
 
     add_bar(0, 2, 0, 0);    
     add_bar(1, 2, 0, 0);    

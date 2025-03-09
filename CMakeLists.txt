@@ -8,21 +8,21 @@ add_subdirectory(lib/cvide)
 
 set(SRCS
 	main.c
-    model.c
-    node.c
-    element.c
-    section.c
-    material.c
-    elements/bar.c
+    lib/model/model.c
+    lib/model/node.c
+    lib/model/element.c
+    lib/model/section.c
+    lib/model/material.c
+    lib/model/elements/bar.c
 )
 
 set(HEADERS
-    model.h
-    node.h
-    element.h
-    section.h
-    material.h
-    elements/bar.h
+    lib/model/model.h
+    lib/model/node.h
+    lib/model/element.h
+    lib/model/section.h
+    lib/model/material.h
+    lib/model/elements/bar.h
 )
 
 add_executable(CSolid ${SRCS} ${HEADERS})

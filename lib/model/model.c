@@ -1,7 +1,7 @@
 #include "model.h"
 #include "element.h"
-#include "lib/cvide/coomat.h"
-#include "lib/cvide/solve.h"
+#include "../cvide/coomat.h"
+#include "../cvide/solve.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>

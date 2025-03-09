@@ -1,7 +1,7 @@
 #ifndef CSOLID_MODEL_H
 #define CSOLID_MODEL_H
 
-#include "lib/cvide/coomat.h"
+#include "../cvide/coomat.h"
 #include "node.h"
 #include "element.h"
 #include <stdbool.h>

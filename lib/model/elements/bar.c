@@ -16,7 +16,7 @@ bar* create_bar(node* n1, node* n2, section* s, material* m) {
 }
 
 coomat* bar_stiffness_matrix(bar* b){
-    double h = b->mat->Ex * b->sec->A / distance(b->n1, b->n2);
+    double h = b->mat->parameters[EX] * b->sec->parameters[SEC] / distance(b->n1, b->n2);
     coomat* res1D = init_coomat(2, 2);
     coomat_set_value(res1D, 0, 0, h);
     coomat_set_value(res1D, 1, 0, -h);
