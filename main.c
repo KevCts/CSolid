@@ -1,54 +1,71 @@
+#include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "lib/cvide/coomat.h"
-#include "lib/model/material.h"
-#include "lib/model/model.h"
-#include "lib/model/elements/bar.h"
-#include "lib/model/node.h"
-#include "lib/model/section.h"
+#include "lib/interpreter/vm.h"
 
-Model model;
+static void repl() {
+    char line[1024];
+    for(;;) {
+        printf("> ");
+
+        if (!fgets(line, sizeof(line), stdin)) {
+            printf("\n");
+            break;
+        }
+
+        interpret(line);
+    }
+}
+
+static char* load_file(char* path){
+    FILE* file = fopen(path, "r");
+
+    fseek(file, 0L, SEEK_END);
+    size_t fileLength = ftell(file);
+    rewind(file);
+
+    char* buffer = malloc(fileLength * sizeof(char) + 1);
+    
+    if(buffer == NULL){
+        fprintf(stderr, "Not enough memory to read file \"%s\".\n", path);
+        exit(74);
+    }
+
+    size_t bytes_read = fread(buffer, sizeof(char), fileLength, file);
+
+    if(bytes_read != fileLength){
+        fprintf(stderr, "Could not open file \"%s\".", path);
+        exit(74);
+    }
+
+    fclose(file);
+    buffer[bytes_read] = '\0';
+    return buffer;
+}
+
+static void run_file(char* path){
+    char* source = load_file(path);
+
+    interpret_result result = interpret(source);
+    free(source);
+
+    if (result == INTERPRET_COMPILE_ERROR) exit(65);
+    if (result == INTERPRET_RUNTIME_ERROR) exit(70);
+}
 
 int main(int argc, char* argv[]) {
-    init_model();
+    init_vm();
 
-    add_node(0, 0, 0);
-    add_node(0, 1, 0);
-    add_node(1, 0, 0);
+    if (argc == 1){
+        repl();
+    } else if (argc == 2) {
+        run_file(argv[1]);
+    } else {
+        fprintf(stderr, "Usage : csolid [path]\n");
+        exit(65);
+    }
 
-    set_material_caracteristic(0, EX, 210000);
-
-    set_section_parameter(0, SEC, 1);
-
-    add_bar(0, 2, 0, 0);    
-    add_bar(1, 2, 0, 0);    
-
-    add_boundary(0, UX, 0);
-    add_boundary(0, UY, 0);
-    add_boundary(0, UZ, 0);
-    add_boundary(0, RX, 0);
-    add_boundary(0, RY, 0);
-    add_boundary(0, RZ, 0);
-    add_boundary(1, UX, 0);
-    add_boundary(1, UY, 0);
-    add_boundary(1, UZ, 0);
-    add_boundary(1, RX, 0);
-    add_boundary(1, RY, 0);
-    add_boundary(1, RZ, 0);
-    add_boundary(2, UZ, 0);
-    add_boundary(2, RX, 0);
-    add_boundary(2, RY, 0);
-    add_boundary(2, RZ, 0);
-
-    add_force(2, UY, -210000);
-
-    solve();
-
-    print_coomat(coomat_from_array(18, 1, model.displacements));
-    printf("\n");
-    print_coomat(coomat_from_array(18, 1, model.reactions));
-
-    free_model();
+    free_vm();
 
     return EXIT_SUCCESS;
 }
