@@ -4,7 +4,15 @@
 virtual_machine vm;
 
 static interpret_result run() {
+    return INTERPRET_SUCCESS;
+}
 
+void init_vm() {
+    init_model();
+}
+
+void free_vm() {
+    free_model();
 }
 
 interpret_result interpret(const char *source) {

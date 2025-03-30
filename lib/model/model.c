@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+Model model;
+
 void init_model() {
     model.nodes = NULL;
     model.boundaries = NULL;

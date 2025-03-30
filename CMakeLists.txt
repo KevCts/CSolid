@@ -14,6 +14,8 @@ set(SRCS
     lib/model/section.c
     lib/model/material.c
     lib/model/elements/bar.c
+    lib/interpreter/vm.c
+    lib/interpreter/compiler.c
 )
 
 set(HEADERS
@@ -23,6 +25,8 @@ set(HEADERS
     lib/model/section.h
     lib/model/material.h
     lib/model/elements/bar.h
+    lib/interpreter/vm.h
+    lib/interpreter/compiler.h
 )
 
 add_executable(CSolid ${SRCS} ${HEADERS})

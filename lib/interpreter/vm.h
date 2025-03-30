@@ -15,7 +15,6 @@ typedef enum {
 typedef struct {
     byte_code* code;
     op_code* ip;
-    Model model;
 } virtual_machine;
 
 void init_vm();
