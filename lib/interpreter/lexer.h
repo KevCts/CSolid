@@ -1,0 +1,42 @@
+#ifndef CSOLID_LEXER_H
+#define CSOLID_LEXER_H
+
+typedef enum {
+    LEXEME_LEFT_PAREN, LEXEME_RIGHT_PAREN,
+    LEXEME_LEFT_BRACE, LEXEME_RIGHT_BRACE,
+    LEXEME_COMMA, LEXEME_DOT, LEXEME_MINUS, LEXEME_PLUS,
+    LEXEME_SEMICOLON, LEXEME_SLASH, LEXEME_STAR,
+
+    LEXEME_BANG, LEXEME_BANG_EQUAL,
+    LEXEME_EQUAL, LEXEME_EQUAL_EQUAL,
+    LEXEME_GREATER, LEXEME_GREATER_EQUAL,
+    LEXEME_LESS, LEXEME_LESS_EQUAL,
+
+    LEXEME_IDENTIFIER, LEXEME_STRING, LEXEME_NUMBER, LEXEME_DOF, LEXEME_FIELD,
+
+    LEXEME_AND, LEXEME_ELSE, LEXEME_FALSE,
+    LEXEME_FOR, LEXEME_FUN, LEXEME_IF, LEXEME_OR,
+    LEXEME_RETURN, LEXEME_TRUE, LEXEME_VAR, LEXEME_WHILE,
+    LEXEME_N, LEXEME_MAT, LEXEME_SEC, LEXEME_BAR, LEXEME_BOUNDARY, LEXEME_FORCE, LEXEME_SOLVE, LEXEME_PRINT,
+
+    LEXEME_ERROR,
+    LEXEME_TAB, LEXEME_EOL, LEXEME_EOF
+} lexeme_type;
+
+typedef struct {
+    lexeme_type type;
+    char* begin;
+    int length;
+    int line;
+} lexeme;
+
+typedef struct {
+    char* begin;
+    char* current;
+    int line;
+} lexer;
+
+void init_lexer(const char* source);
+lexeme scan_lexeme();
+
+#endif
