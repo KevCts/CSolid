@@ -2,7 +2,7 @@
 #define CSOLID_VM_H
 
 #include <stdint.h>
-#include "../csolid/model.h"
+#include "csolid/model.h"
 
 typedef enum {
     INTERPRET_SUCCESS,

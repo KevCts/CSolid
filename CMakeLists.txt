@@ -8,13 +8,11 @@ add_subdirectory(lib/csolid)
 
 set(SRCS
 	main.c
-    lib/interpreter/vm.c
-    lib/interpreter/compiler.c
+    lib/vm.c
 )
 
 set(HEADERS
-    lib/interpreter/vm.h
-    lib/interpreter/compiler.h
+    lib/vm.h
 )
 
 add_executable(CSolid ${SRCS} ${HEADERS})

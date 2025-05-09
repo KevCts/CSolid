@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "lib/interpreter/vm.h"
+#include "lib/vm.h"
 
 static void repl() {
     char line[1024];
@@ -20,6 +20,11 @@ static void repl() {
 static char* load_file(char* path){
     FILE* file = fopen(path, "r");
 
+    if (file == NULL) {
+        fprintf(stderr, "File \"%s\" does not exist.\n", path);
+        exit(74);
+    }
+
     fseek(file, 0L, SEEK_END);
     size_t fileLength = ftell(file);
     rewind(file);
@@ -34,7 +39,7 @@ static char* load_file(char* path){
     size_t bytes_read = fread(buffer, sizeof(char), fileLength, file);
 
     if(bytes_read != fileLength){
-        fprintf(stderr, "Could not open file \"%s\".", path);
+        fprintf(stderr, "Could not open file \"%s\".\n", path);
         exit(74);
     }
 
