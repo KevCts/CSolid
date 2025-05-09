@@ -2,9 +2,7 @@
 #define CSOLID_VM_H
 
 #include <stdint.h>
-#include "../model/model.h"
-#include "byte_code.h"
-#include "compiler.h"
+#include "../csolid/model.h"
 
 typedef enum {
     INTERPRET_SUCCESS,
@@ -13,8 +11,7 @@ typedef enum {
 } interpret_result;
 
 typedef struct {
-    byte_code* code;
-    op_code* ip;
+
 } virtual_machine;
 
 void init_vm();

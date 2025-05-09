@@ -4,31 +4,19 @@ SET(CMAKE_BUILD_TYPE Debug)
 
 project(CSolid)
 
-add_subdirectory(lib/cvide)
+add_subdirectory(lib/csolid)
 
 set(SRCS
 	main.c
-    lib/model/model.c
-    lib/model/node.c
-    lib/model/element.c
-    lib/model/section.c
-    lib/model/material.c
-    lib/model/elements/bar.c
     lib/interpreter/vm.c
     lib/interpreter/compiler.c
 )
 
 set(HEADERS
-    lib/model/model.h
-    lib/model/node.h
-    lib/model/element.h
-    lib/model/section.h
-    lib/model/material.h
-    lib/model/elements/bar.h
     lib/interpreter/vm.h
     lib/interpreter/compiler.h
 )
 
 add_executable(CSolid ${SRCS} ${HEADERS})
 
-target_link_libraries(CSolid libcvide)
+target_link_libraries(CSolid libcsolid)

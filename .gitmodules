@@ -1,3 +1,6 @@
 [submodule "lib/cvide"]
 	path = lib/cvide
 	url = git@github.com:KevCts/CVide.git
+[submodule "lib/csolid"]
+	path = lib/csolid
+	url = git@github.com:KevCts/libcsolid.git
