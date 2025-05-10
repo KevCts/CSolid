@@ -1,8 +1,8 @@
 #ifndef CSOLID_VM_H
 #define CSOLID_VM_H
 
-#include <stdint.h>
 #include "csolid/model.h"
+#include "chunk.h"
 
 typedef enum {
     INTERPRET_SUCCESS,
@@ -11,7 +11,8 @@ typedef enum {
 } interpret_result;
 
 typedef struct {
-
+    chunk* code;
+    op_code* ip;
 } virtual_machine;
 
 void init_vm();

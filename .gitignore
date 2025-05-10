@@ -68,3 +68,8 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
+
+# cinclude2dot
+cinclude2dot
+inc.dot
+inc.svg

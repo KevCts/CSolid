@@ -9,10 +9,18 @@ add_subdirectory(lib/csolid)
 set(SRCS
 	main.c
     lib/vm.c
+    lib/chunk.c
+    lib/compiler.c
+    lib/lexer.c
+    lib/memory.c
 )
 
 set(HEADERS
     lib/vm.h
+    lib/chunk.h
+    lib/compiler.h
+    lib/lexer.h
+    lib/memory.h
 )
 
 add_executable(CSolid ${SRCS} ${HEADERS})
