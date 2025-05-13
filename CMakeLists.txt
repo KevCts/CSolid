@@ -13,6 +13,7 @@ set(SRCS
     lib/compiler.c
     lib/lexer.c
     lib/memory.c
+    lib/value.c
 )
 
 set(HEADERS
@@ -21,6 +22,7 @@ set(HEADERS
     lib/compiler.h
     lib/lexer.h
     lib/memory.h
+    lib/value.h
 )
 
 add_executable(CSolid ${SRCS} ${HEADERS})

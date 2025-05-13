@@ -2,6 +2,10 @@
 #define CSOLID_LEXER_H
 
 typedef enum {
+    LEXEME_PLUS, LEXEME_MINUS, LEXEME_STAR, LEXEME_SLASH,
+
+    LEXEME_NUMBER,
+
     LEXEME_EOF, LEXEME_ERROR
 } lexeme_type;
 

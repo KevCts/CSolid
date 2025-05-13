@@ -39,8 +39,46 @@ static lexeme error_lexeme(const char* message) {
     return result;
 }
 
+static char see_next_letter() {
+    return *lexer.current;
+}
+
+static char scan_next_letter() {
+    lexer.current++;
+    return lexer.current[-1];
+}
+
+static bool is_numeric(char c){
+    return (c >= '0' && c <= '9') || (c == '.' && (see_next_letter() >= '0' && see_next_letter() <= '9'));
+}
+
+static lexeme number_lexeme() {
+    while (is_numeric(see_next_letter()))
+        scan_next_letter();
+    return make_lexeme(LEXEME_NUMBER);
+}
+
 lexeme scan_lexeme() {
     lexer.start = lexer.current;
+    
     if (end_of_file()) return make_lexeme(LEXEME_EOF);
+
+    char c = scan_next_letter();
+
+    if (is_numeric(c)) number_lexeme();
+    
+    switch (c) {
+        case '+':
+            return make_lexeme(LEXEME_PLUS);
+        case '-':
+            return make_lexeme(LEXEME_MINUS);
+        case '*':
+            return make_lexeme(LEXEME_STAR);
+        case '/':
+            return make_lexeme(LEXEME_SLASH);
+        default:
+            break;
+    }
+
     return error_lexeme("Expected character");
 }

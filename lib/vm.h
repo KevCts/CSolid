@@ -12,11 +12,12 @@ typedef enum {
 
 typedef struct {
     chunk* code;
-    op_code* ip;
+    uint8_t* ip;
 } virtual_machine;
 
 void init_vm();
 void free_vm();
+void push(value* val);
 interpret_result interpret(const char* source);
 
 #endif

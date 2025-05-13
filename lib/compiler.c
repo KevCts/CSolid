@@ -1,5 +1,8 @@
 #include "compiler.h"
 #include "lexer.h"
+#include "value.h"
+#include <stdint.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 typedef struct {
@@ -12,8 +15,42 @@ typedef struct {
 
 parser compiler;
 
+typedef enum {
+    PREC_TERM,
+    PREC_FACTOR,
+} precedence;
+
+typedef void (*parse_fn)();
+
+typedef struct {
+    parse_fn prefix;
+    parse_fn infix;
+    precedence prec;
+} parse_rule;
+
+static void error(const char* message);
+
 static void emit_byte(op_code byte) {
     write_chunk(compiler.code, byte, compiler.previous.line);
+}
+
+static uint8_t make_constant(value cst) {
+    int result = add_value_to_array(cst, compiler.code->constants);
+    if (result > UINT8_MAX) {
+        error("Too much constants in one chunk.");
+        return 0;
+    }
+        return (uint8_t)result;
+
+}
+
+static void emit_constant(value cst) {
+    emit_byte(OP_CONSTANT);
+    emit_byte(make_constant(cst));
+}
+
+void number() {
+    emit_constant(NUMBER_VALUE(strtod(compiler.current.start, NULL)));
 }
 
 static void compile_end() {
@@ -42,9 +79,11 @@ static void error(const char* message) {
 static void parse_next_lexeme() {
     compiler.previous = compiler.current;
 
+    for (;;) {
         compiler.current = scan_lexeme();
-        if (compiler.current.type == LEXEME_ERROR)
-            error(compiler.current.start);
+        if (compiler.current.type != LEXEME_ERROR) break;
+        error(compiler.current.start);
+    }
 }
 
 static void consume_lexeme(lexeme_type lexeme_to_consume, const char* message) {
@@ -64,6 +103,7 @@ bool compile(const char* source, chunk* code) {
     compiler.panic_mode = false;
 
     parse_next_lexeme();
+    
     consume_lexeme(LEXEME_EOF, "EXPECTED END OF EXPRESSION.");
 
     compile_end();

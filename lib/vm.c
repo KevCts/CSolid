@@ -1,6 +1,5 @@
 #include "vm.h"
 #include "compiler.h"
-#include <stdio.h>
 
 virtual_machine vm;
 

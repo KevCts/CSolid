@@ -2,8 +2,11 @@
 #define CSOLID_CHUNK_H
 
 #include "memory.h"
+#include "value.h"
+#include <stdint.h>
  
 typedef enum {
+    OP_CONSTANT,
     OP_RETURN,
 } op_code;
 
@@ -11,11 +14,14 @@ typedef struct {
     size_t count;
     size_t capacity;
     int* lines;
-    op_code* code;
+    uint8_t* code;
+    value_array* constants;
 } chunk;
 
 chunk* new_chunk();
 void free_chunk(chunk* pointer);
+
+void add_constant(value val);
 
 void write_chunk(chunk* chunk_to_write, op_code byte, int line);
 
