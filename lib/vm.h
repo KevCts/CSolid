@@ -4,6 +4,8 @@
 #include "csolid/model.h"
 #include "chunk.h"
 
+#define STACK_MAX 256
+
 typedef enum {
     INTERPRET_SUCCESS,
     INTERPRET_COMPILE_ERROR,
@@ -13,11 +15,13 @@ typedef enum {
 typedef struct {
     chunk* code;
     uint8_t* ip;
+
+    value stack[STACK_MAX];
+    value* stack_top;
 } virtual_machine;
 
 void init_vm();
 void free_vm();
-void push(value* val);
 interpret_result interpret(const char* source);
 
 #endif

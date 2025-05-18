@@ -1,4 +1,5 @@
 #include "chunk.h"
+#include "value.h"
 #include <stdlib.h>
 
 chunk* new_chunk(){
@@ -8,12 +9,14 @@ chunk* new_chunk(){
     result->count = 0;
     result->lines = NULL;
     result->code = NULL;
+    result->constants = new_value_array();
     return result;
 }
 
 void free_chunk(chunk* pointer){
     FREE(pointer->code);
     FREE(pointer->lines);
+    free_value_array(pointer->constants);
     free(pointer);
 }
 
@@ -23,7 +26,6 @@ void write_chunk(chunk* chunk_to_write, op_code byte, int line) {
         chunk_to_write->code = GROW_ARRAY(uint8_t, chunk_to_write->code, chunk_to_write->capacity);
         chunk_to_write->lines = GROW_ARRAY(int, chunk_to_write->lines, chunk_to_write->capacity);
     }
-    chunk_to_write->count++;
     chunk_to_write->code[chunk_to_write->count] = byte;
-    chunk_to_write->lines[chunk_to_write->count] = line;
+    chunk_to_write->lines[chunk_to_write->count++] = line;
 }

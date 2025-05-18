@@ -69,6 +69,5 @@ int main(int argc, char* argv[]) {
     }
 
     free_vm();
-
     return EXIT_SUCCESS;
 }

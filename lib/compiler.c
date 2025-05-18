@@ -1,4 +1,5 @@
 #include "compiler.h"
+#include "chunk.h"
 #include "lexer.h"
 #include "value.h"
 #include <stdint.h>
@@ -16,8 +17,11 @@ typedef struct {
 parser compiler;
 
 typedef enum {
+    PREC_NONE,
+    PREC_ASSIGNMENT,
     PREC_TERM,
     PREC_FACTOR,
+    PREC_UNARY,
 } precedence;
 
 typedef void (*parse_fn)();
@@ -29,8 +33,10 @@ typedef struct {
 } parse_rule;
 
 static void error(const char* message);
+static parse_rule* get_parse_rule(lexeme_type lex_type);
+static void parse_next_lexeme();
 
-static void emit_byte(op_code byte) {
+static void emit_byte(uint8_t byte) {
     write_chunk(compiler.code, byte, compiler.previous.line);
 }
 
@@ -50,7 +56,72 @@ static void emit_constant(value cst) {
 }
 
 void number() {
-    emit_constant(NUMBER_VALUE(strtod(compiler.current.start, NULL)));
+    emit_constant(NUMBER_VALUE(strtod(compiler.previous.start, NULL)));
+}
+
+void parse_precedence(precedence prec) {
+    parse_next_lexeme();
+
+    parse_fn prefix_fn = get_parse_rule(compiler.previous.type)->prefix;
+
+    if (prefix_fn == NULL) {
+        error("Expected expression.");
+        return;
+    }
+
+    prefix_fn();
+
+    while (prec <= get_parse_rule(compiler.current.type)->prec) {
+        parse_next_lexeme();
+        parse_fn infix_fn = get_parse_rule(compiler.previous.type)->infix;
+        infix_fn();
+    }
+}
+
+void unary() {
+    lexeme_type operand = compiler.previous.type;
+
+    parse_precedence(PREC_UNARY);
+
+    switch (operand) {
+        case LEXEME_MINUS :
+            emit_byte(OP_NEGATE); break;
+        default :
+            return;
+    }
+}
+
+void binary() {
+    lexeme_type operand = compiler.previous.type;
+
+    parse_precedence(get_parse_rule(operand)->prec);
+
+    switch (operand) {
+        case LEXEME_PLUS :
+            emit_byte(OP_ADD); break;
+        case LEXEME_MINUS :
+            emit_byte(OP_SUBSTRACT); break;
+        case LEXEME_STAR :
+            emit_byte(OP_MULTIPLY); break;
+        case LEXEME_SLASH :
+            emit_byte(OP_DIVIDE); break;
+        default :
+            return;
+    }
+}
+
+parse_rule parse_rules[] = {
+    [LEXEME_NUMBER]  = {number, NULL, PREC_NONE},
+    [LEXEME_PLUS]  = {NULL, binary, PREC_TERM},
+    [LEXEME_MINUS]  = {unary, binary, PREC_TERM},
+    [LEXEME_STAR]  = {NULL, binary, PREC_FACTOR},
+    [LEXEME_SLASH]  = {NULL, binary, PREC_FACTOR},
+    [LEXEME_ERROR] = {NULL, NULL, PREC_NONE},
+    [LEXEME_EOF] = {NULL, NULL, PREC_NONE},
+};
+
+static parse_rule* get_parse_rule(lexeme_type lex_type) {
+    return &parse_rules[lex_type];
 }
 
 static void compile_end() {
@@ -95,6 +166,10 @@ static void consume_lexeme(lexeme_type lexeme_to_consume, const char* message) {
     error(message);
 }
 
+static void build_op_code() {
+    parse_precedence(PREC_ASSIGNMENT);
+}
+
 bool compile(const char* source, chunk* code) {
     init_lexer(source);
 
@@ -103,7 +178,7 @@ bool compile(const char* source, chunk* code) {
     compiler.panic_mode = false;
 
     parse_next_lexeme();
-    
+    build_op_code();
     consume_lexeme(LEXEME_EOF, "EXPECTED END OF EXPRESSION.");
 
     compile_end();

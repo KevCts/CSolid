@@ -21,7 +21,7 @@ typedef struct {
 } value_array;
 
 #define NUMBER_VALUE(num) ((value){TYPE_NUMBER, {.number = (num)}})
-#define IS_NUMBER(val) ((val).type == TYPE_NUMBER);
+#define IS_NUMBER(val) ((val).type == TYPE_NUMBER)
 
 value_array* new_value_array();
 void free_value_array(value_array* array);

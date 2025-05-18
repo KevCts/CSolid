@@ -28,6 +28,6 @@ size_t add_value_to_array(value val, value_array* array) {
 void print_value(value val) {
     switch (val.type) {
         case TYPE_NUMBER :
-            printf("%lf", val.as.number);
+            printf("%g", val.as.number);
     }
 }
