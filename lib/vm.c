@@ -29,6 +29,14 @@ static value pop() {
     return *(--vm.stack_top);
 }
 
+static value see_next_value() {
+    return *(vm.stack_top - 1);
+}
+
+static value see_next_next_value() {
+    return *(vm.stack_top - 2);
+}
+
 static interpret_result run(){
     for (;;) {
         uint8_t instruction = READ_OP_CODE();
@@ -38,11 +46,13 @@ static interpret_result run(){
                 push(POP_CONSTANT());
                 break;
             case OP_NEGATE:
-                value val = POP_CONSTANT();
-                if (IS_NUMBER(val))
-                    push(NUMBER_VALUE(-1 * val.as.number));
+                if (IS_NUMBER(see_next_value()))
+                    push(NUMBER_VALUE(-1 * pop().as.number));
                 break;
             case OP_ADD:
+                if (IS_NUMBER(see_next_value()) && IS_NUMBER(see_next_next_value()))
+                    push(NUMBER_VALUE(pop().as.number + pop().as.number));
+                break;
             case OP_SUBSTRACT:
             case OP_MULTIPLY:
             case OP_DIVIDE:
