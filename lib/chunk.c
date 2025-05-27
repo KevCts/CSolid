@@ -1,6 +1,8 @@
 #include "chunk.h"
+#include "memory.h"
 #include "value.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 chunk* new_chunk(){
     chunk* result = malloc(sizeof(chunk));
