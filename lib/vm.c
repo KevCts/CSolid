@@ -54,8 +54,17 @@ static interpret_result run(){
                     push(NUMBER_VALUE(pop().as.number + pop().as.number));
                 break;
             case OP_SUBSTRACT:
+                if (IS_NUMBER(see_next_value()) && IS_NUMBER(see_next_next_value()))
+                    push(NUMBER_VALUE(pop().as.number - pop().as.number));
+                break;
             case OP_MULTIPLY:
+                if (IS_NUMBER(see_next_value()) && IS_NUMBER(see_next_next_value()))
+                    push(NUMBER_VALUE(pop().as.number * pop().as.number));
+                break;
             case OP_DIVIDE:
+                if (IS_NUMBER(see_next_value()) && IS_NUMBER(see_next_next_value()) && see_next_next_value().as.number != 0)
+                    push(NUMBER_VALUE(pop().as.number / pop().as.number));
+                break;
             case OP_RETURN:
                 print_value(pop());
                 printf("\n");
