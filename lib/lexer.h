@@ -11,6 +11,10 @@ typedef enum {
 
     LEXEME_NUMBER,
 
+    LEXEME_N, LEXEME_NLIST,
+
+    LEXEME_LITTERAL,
+
     LEXEME_EOF, LEXEME_ERROR
 } lexeme_type;
 

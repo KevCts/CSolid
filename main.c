@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "lib/vm.h"
 
 static void repl() {
@@ -11,6 +12,9 @@ static void repl() {
             break;
         }
 
+        if (memcmp(line, "exit", 4) == 0)
+            break;
+        
         interpret(line);
     }
 }

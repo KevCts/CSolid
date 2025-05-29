@@ -15,13 +15,15 @@ obj* new_list() {
 }
 
 void free_object(obj* pointer) {
-    switch (pointer->type) {
-        case OBJ_LIST:
-            free_value_array(((obj_list*)pointer)->list);
-            break;
+    if (pointer != NULL) {
+        switch (pointer->type) {
+            case OBJ_LIST:
+                free_value_array(((obj_list*)pointer)->list);
+                break;
+        }
+        free_object(pointer->next);
+        free(pointer);
     }
-    free_object(pointer->next);
-    free(pointer);
 }
 
 void list_append(obj_list* list, value val) {

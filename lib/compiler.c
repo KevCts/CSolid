@@ -22,6 +22,7 @@ typedef enum {
     PREC_TERM,
     PREC_FACTOR,
     PREC_UNARY,
+    PREC_CALL,
 } precedence;
 
 typedef void (*parse_fn)();
@@ -43,7 +44,7 @@ static void emit_byte(uint8_t byte) {
 static uint8_t make_constant(value cst) {
     int result = add_value_to_array(cst, compiler.code->constants);
     if (result > UINT8_MAX) {
-        error("Too much constants in one chunk.");
+        error("Too much constants in one chunk");
         return 0;
     }
         return (uint8_t)result;
@@ -65,7 +66,7 @@ void parse_precedence(precedence prec) {
     parse_fn prefix_fn = get_parse_rule(compiler.previous.type)->prefix;
 
     if (prefix_fn == NULL) {
-        error("Expected expression.");
+        error("Expected expression");
         return;
     }
 
@@ -132,7 +133,21 @@ static void list() {
     emit_byte(OP_LIST_END);
 }
 
+static void n() {
+    int line = compiler.previous.line;
+    while (line == compiler.current.line) {
+        parse_precedence(PREC_ASSIGNMENT);
+    }
+    emit_byte(OP_N);
+}
+
+static void nlist(){
+    emit_byte(OP_NLIST);
+}
+
 parse_rule parse_rules[] = {
+    [LEXEME_N] = {n, NULL, PREC_CALL},
+    [LEXEME_NLIST] = {nlist, NULL, PREC_NONE},
     [LEXEME_LEFT_PAREN] = {grouping, NULL, PREC_NONE},
     [LEXEME_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
     [LEXEME_LEFT_BRACE] = {list, NULL, PREC_NONE},

@@ -63,14 +63,14 @@ static lexeme number_lexeme() {
 
     if (see_next_letter() == '.' && (see_next_next_letter() >= '0' && see_next_next_letter() <= '9'))
         scan_next_letter();
-    
+
     while (is_numeric(see_next_letter()))
         scan_next_letter();
-    
+
     if (see_next_letter() == 'E' || see_next_letter() == 'e') {
         scan_next_letter();
         if ((see_next_letter() == '+' || see_next_letter() == '-') && is_numeric(see_next_next_letter()))
-                scan_next_letter();
+            scan_next_letter();
         while (is_numeric(see_next_letter())) {
             scan_next_letter();
         }
@@ -98,17 +98,52 @@ static void skip_whitespace() {
     }
 }
 
+static bool is_alpha(char c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+}
+
+static lexeme_type keyword(int begin, int length, char* rest_to_check, lexeme_type objective) {
+    if (lexer.current - lexer.start == length + begin && memcmp(lexer.start + begin, rest_to_check, length) == 0) return objective;
+
+    return LEXEME_LITTERAL;
+}
+
+static lexeme_type litteral_type() {
+    switch (lexer.start[0]) {
+        case 'n':
+        case 'N':
+            if (lexer.current - lexer.start >  1) {
+                switch (lexer.start[1]) {
+                    case 'l':
+                    case 'L':
+                        return keyword(2, 3, "ist", LEXEME_NLIST);
+                }
+            }
+            return keyword(1, 0, "", LEXEME_N);
+        default:
+            return LEXEME_LITTERAL;
+    }
+}
+
+static lexeme litteral_lexeme() {
+    while (is_alpha(see_next_letter()) || is_numeric(see_next_letter())) scan_next_letter();
+
+    return make_lexeme(litteral_type());
+}
+
 lexeme scan_lexeme() {
     lexer.start = lexer.current;
 
     skip_whitespace();
-    
+
     if (end_of_file()) return make_lexeme(LEXEME_EOF);
 
     char c = scan_next_letter();
 
     if (is_numeric(c)) return number_lexeme();
-    
+
+    if (is_alpha(c)) return litteral_lexeme();
+
     switch (c) {
         case '(':
             return make_lexeme(LEXEME_LEFT_PAREN);
