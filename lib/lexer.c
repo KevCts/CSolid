@@ -122,6 +122,10 @@ lexeme scan_lexeme() {
             return make_lexeme(LEXEME_STAR);
         case '/':
             return make_lexeme(LEXEME_SLASH);
+        case '[':
+            return make_lexeme(LEXEME_LEFT_BRACE);
+        case ']':
+            return make_lexeme(LEXEME_RIGHT_BRACE);
         default:
             break;
     }

@@ -3,14 +3,19 @@
 
 #include <stddef.h>
 
+typedef struct obj obj;
+
 typedef enum {
+    TYPE_NIL,
     TYPE_NUMBER,
+    TYPE_OBJECT,
 } value_type;
 
 typedef struct {
     value_type type;
     union {
         double number;
+        obj* object;
     } as;
 } value;
 
@@ -20,8 +25,13 @@ typedef struct {
     value* values;
 } value_array;
 
+#define NIL_VALUE ((value){TYPE_NIL, {.number = 0}})
 #define NUMBER_VALUE(num) ((value){TYPE_NUMBER, {.number = (num)}})
+#define OBJ_VALUE(obj) ((value){TYPE_OBJECT, {.object = (obj)}})
+
+#define IS_NIL(val) ((val).type == TYPE_NIL)
 #define IS_NUMBER(val) ((val).type == TYPE_NUMBER)
+#define IS_OBJ(val) ((val).type == TYPE_OBJECT)
 
 value_array* new_value_array();
 void free_value_array(value_array* array);

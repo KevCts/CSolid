@@ -7,6 +7,8 @@
  
 typedef enum {
     OP_CONSTANT,
+    OP_LIST_START,
+    OP_LIST_END,
     OP_NEGATE,
     OP_ADD,
     OP_SUBSTRACT,

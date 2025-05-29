@@ -1,5 +1,6 @@
 #include "value.h"
 #include "memory.h"
+#include "object.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -27,7 +28,14 @@ size_t add_value_to_array(value val, value_array* array) {
 
 void print_value(value val) {
     switch (val.type) {
+        case TYPE_NIL :
+            printf("NIL");
+            break;
         case TYPE_NUMBER :
             printf("%g", val.as.number);
+            break;
+        case TYPE_OBJECT :
+            print_object(val.as.object);
+            break;
     }
 }

@@ -18,7 +18,11 @@ typedef struct {
 
     value stack[STACK_MAX];
     value* stack_top;
+
+    obj* objects;
 } virtual_machine;
+
+extern virtual_machine vm;
 
 void init_vm();
 void free_vm();

@@ -121,12 +121,22 @@ static void consume_lexeme(lexeme_type lexeme_to_consume, const char* message) {
 
 static void grouping() {
     parse_precedence(PREC_ASSIGNMENT);
-    consume_lexeme(LEXEME_RIGHT_PAREN, "Expected \')\' not found");
+    consume_lexeme(LEXEME_RIGHT_PAREN, "EXPECTED \')\' NOT FOUND");
+}
+
+static void list() {
+    emit_byte(OP_LIST_START);
+    while (compiler.current.type != LEXEME_RIGHT_BRACE && compiler.current.type != LEXEME_EOF)
+        parse_precedence(PREC_ASSIGNMENT);
+    consume_lexeme(LEXEME_RIGHT_BRACE, "EXPECTED \']\' NOT FOUND");
+    emit_byte(OP_LIST_END);
 }
 
 parse_rule parse_rules[] = {
     [LEXEME_LEFT_PAREN] = {grouping, NULL, PREC_NONE},
     [LEXEME_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
+    [LEXEME_LEFT_BRACE] = {list, NULL, PREC_NONE},
+    [LEXEME_RIGHT_BRACE] = {NULL, NULL, PREC_NONE},
     [LEXEME_NUMBER]  = {number, NULL, PREC_NONE},
     [LEXEME_PLUS]  = {NULL, binary, PREC_TERM},
     [LEXEME_MINUS]  = {unary, binary, PREC_TERM},
@@ -187,7 +197,7 @@ bool compile(const char* source, chunk* code) {
 
     parse_next_lexeme();
     build_op_code();
-    consume_lexeme(LEXEME_EOF, "EXPECTED END OF EXPRESSION.");
+    consume_lexeme(LEXEME_EOF, "EXPECTED END OF EXPRESSION");
 
     compile_end();
     return !compiler.had_error;

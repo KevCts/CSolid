@@ -3,6 +3,7 @@
 #include "compiler.h"
 #include "memory.h"
 #include "value.h"
+#include "object.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -14,10 +15,11 @@ virtual_machine vm;
 
 void init_vm() {
     vm.stack_top = vm.stack;
+    vm.objects = NULL;
 }
 
 void free_vm() {
-
+    free_object(vm.objects);
 }
 
 static void push(value val) {
@@ -32,6 +34,7 @@ static value pop() {
 static value see_next_value() {
     return *(vm.stack_top - 1);
 }
+
 
 static value see_next_next_value() {
     return *(vm.stack_top - 2);
@@ -64,6 +67,15 @@ static interpret_result run(){
             case OP_DIVIDE:
                 if (IS_NUMBER(see_next_value()) && IS_NUMBER(see_next_next_value()) && see_next_next_value().as.number != 0)
                     push(NUMBER_VALUE(pop().as.number / pop().as.number));
+                break;
+            case OP_LIST_START:
+                push(NIL_VALUE);
+                break;
+            case OP_LIST_END:
+                obj_list* list = (obj_list*)new_list();
+                while (!IS_NIL(see_next_value()))
+                    list_append(list, pop()); 
+                push(OBJ_VALUE((obj*)list));
                 break;
             case OP_RETURN:
                 print_value(pop());
