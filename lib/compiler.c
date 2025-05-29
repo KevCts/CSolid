@@ -110,7 +110,23 @@ void binary() {
     }
 }
 
+static void consume_lexeme(lexeme_type lexeme_to_consume, const char* message) {
+    if (compiler.current.type == lexeme_to_consume) {
+        parse_next_lexeme();
+        return;
+    }
+
+    error(message);
+}
+
+static void grouping() {
+    parse_precedence(PREC_ASSIGNMENT);
+    consume_lexeme(LEXEME_RIGHT_PAREN, "Expected \')\' not found");
+}
+
 parse_rule parse_rules[] = {
+    [LEXEME_LEFT_PAREN] = {grouping, NULL, PREC_NONE},
+    [LEXEME_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
     [LEXEME_NUMBER]  = {number, NULL, PREC_NONE},
     [LEXEME_PLUS]  = {NULL, binary, PREC_TERM},
     [LEXEME_MINUS]  = {unary, binary, PREC_TERM},
@@ -157,14 +173,6 @@ static void parse_next_lexeme() {
     }
 }
 
-static void consume_lexeme(lexeme_type lexeme_to_consume, const char* message) {
-    if (compiler.current.type == lexeme_to_consume) {
-        parse_next_lexeme();
-        return;
-    }
-
-    error(message);
-}
 
 static void build_op_code() {
     parse_precedence(PREC_ASSIGNMENT);

@@ -60,6 +60,21 @@ static bool is_numeric(char c){
 static lexeme number_lexeme() {
     while (is_numeric(see_next_letter()))
         scan_next_letter();
+
+    if (see_next_letter() == '.' && (see_next_next_letter() >= '0' && see_next_next_letter() <= '9'))
+        scan_next_letter();
+    
+    while (is_numeric(see_next_letter()))
+        scan_next_letter();
+    
+    if (see_next_letter() == 'E' || see_next_letter() == 'e') {
+        scan_next_letter();
+        if ((see_next_letter() == '+' || see_next_letter() == '-') && is_numeric(see_next_next_letter()))
+                scan_next_letter();
+        while (is_numeric(see_next_letter())) {
+            scan_next_letter();
+        }
+    }
     return make_lexeme(LEXEME_NUMBER);
 }
 
@@ -95,6 +110,10 @@ lexeme scan_lexeme() {
     if (is_numeric(c)) return number_lexeme();
     
     switch (c) {
+        case '(':
+            return make_lexeme(LEXEME_LEFT_PAREN);
+        case ')':
+            return make_lexeme(LEXEME_RIGHT_PAREN);
         case '+':
             return make_lexeme(LEXEME_PLUS);
         case '-':
