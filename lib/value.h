@@ -2,11 +2,13 @@
 #define CSOLID_VALUE_H
 
 #include <stddef.h>
+#include "csolid/material.h"
 
 typedef struct obj obj;
 
 typedef enum {
     TYPE_NIL,
+    TYPE_MAT_PROP,
     TYPE_NUMBER,
     TYPE_OBJECT,
 } value_type;
@@ -15,9 +17,11 @@ typedef struct {
     value_type type;
     union {
         double number;
+        material_caracteristics material_prop;
         obj* object;
     } as;
 } value;
+
 
 typedef struct {
     size_t count;
@@ -27,10 +31,12 @@ typedef struct {
 
 #define NIL_VALUE ((value){TYPE_NIL, {.number = 0}})
 #define NUMBER_VALUE(num) ((value){TYPE_NUMBER, {.number = (num)}})
+#define MAT_PROP_VALUE(prop) ((value){TYPE_MAT_PROP, {.material_prop = (prop)}})
 #define OBJ_VALUE(obj) ((value){TYPE_OBJECT, {.object = (obj)}})
 
 #define IS_NIL(val) ((val).type == TYPE_NIL)
 #define IS_NUMBER(val) ((val).type == TYPE_NUMBER)
+#define IS_MAT_PROP(val) ((val).type == TYPE_MAT_PROP)
 #define IS_OBJ(val) ((val).type == TYPE_OBJECT)
 
 value_array* new_value_array();

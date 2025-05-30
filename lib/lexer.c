@@ -1,4 +1,6 @@
 #include "lexer.h"
+#include <stdlib.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -99,9 +101,22 @@ static bool is_alpha(char c) {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
 
-static lexeme_type keyword(int begin, int length, char* rest_to_check, lexeme_type objective) {
-    if (lexer.current - lexer.start == length + begin && memcmp(lexer.start + begin, rest_to_check, length) == 0) return objective;
+static char* to_lower(const char* str, int length) {
+    char* result = malloc(length * sizeof(char));
+    for (int i = 0; i < length; i++)
+        result[i] = tolower(str[i]);
+    return result;
+}
 
+static lexeme_type keyword(int begin, int length, char* rest_to_check, lexeme_type objective) {
+    if(lexer.current - lexer.start == length + begin) {
+        char* lowercase = to_lower(lexer.start + begin, length); 
+        if (memcmp(lowercase, rest_to_check, length) == 0) {
+            free(lowercase);
+            return objective;
+        }
+        free(lowercase);
+    }
     return LEXEME_LITTERAL;
 }
 
