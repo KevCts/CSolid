@@ -135,9 +135,9 @@ static void list() {
 
 static void n() {
     int line = compiler.previous.line;
-    while (line == compiler.current.line) {
+    do {
         parse_precedence(PREC_ASSIGNMENT);
-    }
+    } while (compiler.current.type != LEXEME_EOL);
     emit_byte(OP_N);
 }
 
@@ -145,8 +145,14 @@ static void nlist(){
     emit_byte(OP_NLIST);
 }
 
+static void compile_end() {
+    emit_byte(OP_RETURN);
+}
+
+static void nothing() {}
+
 parse_rule parse_rules[] = {
-    [LEXEME_N] = {n, NULL, PREC_CALL},
+    [LEXEME_N] = {n, NULL, PREC_NONE},
     [LEXEME_NLIST] = {nlist, NULL, PREC_NONE},
     [LEXEME_LEFT_PAREN] = {grouping, NULL, PREC_NONE},
     [LEXEME_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
@@ -158,6 +164,7 @@ parse_rule parse_rules[] = {
     [LEXEME_STAR]  = {NULL, binary, PREC_FACTOR},
     [LEXEME_SLASH]  = {NULL, binary, PREC_FACTOR},
     [LEXEME_ERROR] = {NULL, NULL, PREC_NONE},
+    [LEXEME_EOL] = {nothing, NULL, PREC_NONE},
     [LEXEME_EOF] = {NULL, NULL, PREC_NONE},
 };
 
@@ -165,13 +172,11 @@ static parse_rule* get_parse_rule(lexeme_type lex_type) {
     return &parse_rules[lex_type];
 }
 
-static void compile_end() {
-    emit_byte(OP_RETURN);
-}
 
 static void error(const char* message) {
     if (compiler.panic_mode) return;
     compiler.had_error = true;
+    compiler.panic_mode = true;
 
     fprintf(stderr, "[Line %d] Error", compiler.previous.line);
 
@@ -210,9 +215,11 @@ bool compile(const char* source, chunk* code) {
     compiler.had_error = false;
     compiler.panic_mode = false;
 
-    parse_next_lexeme();
-    build_op_code();
-    consume_lexeme(LEXEME_EOF, "EXPECTED END OF EXPRESSION");
+    do {
+        parse_next_lexeme();
+        if (compiler.current.type != LEXEME_EOF)
+            build_op_code();
+    } while (compiler.current.type != LEXEME_EOF);
 
     compile_end();
     return !compiler.had_error;

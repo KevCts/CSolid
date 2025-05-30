@@ -86,10 +86,7 @@ static void skip_whitespace() {
             case ' ':
             case '\t':
             case '\r':
-                scan_next_letter();
-                break;
-            case '\n':
-                lexer.line++;
+                lexer.start++;
                 scan_next_letter();
                 break;
             default:
@@ -145,6 +142,9 @@ lexeme scan_lexeme() {
     if (is_alpha(c)) return litteral_lexeme();
 
     switch (c) {
+        case '\n':
+            lexer.line++;
+            return make_lexeme(LEXEME_EOL);
         case '(':
             return make_lexeme(LEXEME_LEFT_PAREN);
         case ')':
