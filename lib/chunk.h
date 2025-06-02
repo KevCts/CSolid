@@ -6,9 +6,15 @@
 #include <stdint.h>
  
 typedef enum {
+    OP_BAR,
+    OP_ELIST,
+    OP_MAT,
+    OP_MLIST,
     OP_N,
     OP_NLIST,
     OP_CONSTANT,
+    OP_SEC,
+    OP_SLIST,
     OP_LIST_START,
     OP_LIST_END,
     OP_NEGATE,

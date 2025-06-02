@@ -37,5 +37,17 @@ void print_value(value val) {
         case TYPE_OBJECT :
             print_object(val.as.object);
             break;
+        case TYPE_MAT_PROP :
+            switch (val.as.material_prop) {
+                case EX:
+                    printf("EX");
+                    break;
+                case EY:
+                    printf("EY");
+                    break;
+                case EZ:
+                    printf("EZ");
+                    break;
+            }
     }
 }

@@ -121,17 +121,74 @@ static lexeme_type keyword(int begin, int length, char* rest_to_check, lexeme_ty
 }
 
 static lexeme_type litteral_type() {
-    switch (lexer.start[0]) {
-        case 'n':
-        case 'N':
+    switch (tolower(lexer.start[0])) {
+        case 'a':
+            return keyword(1, 0, "", LEXEME_A);
+        case 'b':
+            return keyword(1, 2, "ar", LEXEME_BAR);
+        case 'e':
             if (lexer.current - lexer.start >  1) {
-                switch (lexer.start[1]) {
+                switch (tolower(lexer.start[1])) {
                     case 'l':
-                    case 'L':
+                        return keyword(2, 3,"ist", LEXEME_ELIST);
+                    case 'x':
+                        return keyword(2, 0, "", LEXEME_EX);
+                    case 'y':
+                        return keyword(2, 0, "", LEXEME_EY);
+                    case 'z':
+                        return keyword(2, 0, "", LEXEME_EZ);
+                }
+            }
+        case 'm':
+            if (lexer.current - lexer.start >  1) {
+                switch (tolower(lexer.start[1])) {
+                    case 'a':
+                        return keyword(2, 1, "t", LEXEME_MAT);
+                    case 'l':
+                        return keyword(2, 3, "ist", LEXEME_MLIST);
+                }
+            }
+        case 'n':
+            if (lexer.current - lexer.start >  1) {
+                switch (tolower(lexer.start[1])) {
+                    case 'l':
                         return keyword(2, 3, "ist", LEXEME_NLIST);
+                    default:
+                        return LEXEME_LITTERAL;
                 }
             }
             return keyword(1, 0, "", LEXEME_N);
+        case 'r':
+            if (lexer.current - lexer.start >  1) {
+                switch (tolower(lexer.start[1])) {
+                    case 'x':
+                        return keyword(2, 0, "", LEXEME_RX);
+                    case 'y':
+                        return keyword(2, 0, "", LEXEME_RY);
+                    case 'z':
+                        return keyword(2, 0, "", LEXEME_RZ);
+                }
+            }
+        case 's':
+            if (lexer.current - lexer.start >  1) {
+                switch (tolower(lexer.start[1])) {
+                    case 'e':
+                        return keyword(2, 1, "c", LEXEME_SEC);
+                    case 'l':
+                        return keyword(2, 3, "ist", LEXEME_SLIST);
+                }
+            }
+        case 'u':
+            if (lexer.current - lexer.start >  1) {
+                switch (tolower(lexer.start[1])) {
+                    case 'x':
+                        return keyword(2, 0, "", LEXEME_UX);
+                    case 'y':
+                        return keyword(2, 0, "", LEXEME_UY);
+                    case 'z':
+                        return keyword(2, 0, "", LEXEME_UZ);
+                }
+            }
         default:
             return LEXEME_LITTERAL;
     }

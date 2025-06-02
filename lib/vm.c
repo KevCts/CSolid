@@ -1,6 +1,10 @@
 #include "vm.h"
 #include "chunk.h"
 #include "compiler.h"
+#include "csolid/element.h"
+#include "csolid/elements/bar.h"
+#include "csolid/material.h"
+#include "csolid/section.h"
 #include "value.h"
 #include "object.h"
 
@@ -50,6 +54,19 @@ static value see_next_next_value() {
     return *(vm.stack_top - 2);
 }
 
+static value pop_nil(value value_if_nil) {
+    value val = pop();
+
+
+    return IS_NIL(val) ? value_if_nil : val;
+}
+
+static int next_nil() {
+    int res = 0;
+    while (!IS_NIL(see_value(++res))) {}
+    return res;
+}
+
 static interpret_result run(){
     for (;;) {
         uint8_t instruction = READ_OP_CODE();
@@ -93,6 +110,7 @@ static interpret_result run(){
                     z = pop().as.number;
                     y = pop().as.number;
                     x = pop().as.number;
+                    pop();
                     add_node(x, y, z);
                 } else {
                     error("Invalid arguments for N");
@@ -101,12 +119,79 @@ static interpret_result run(){
             case OP_NLIST:
                 list_nodes();
                 break;
+            case OP_MAT:
+                double prop_value;
+                material_caracteristics material_prop;
+                if (IS_NUMBER(see_value(1)) && IS_MAT_PROP(see_value(2))) {
+                    prop_value = pop().as.number;
+                    material_prop = pop().as.material_prop;
+                } else
+                    error("Invalid arguments for MAT");
+
+                if (IS_NIL(see_value(1)) || IS_NUMBER(see_value(1))) {
+                    if (!set_material_caracteristic(pop_nil(NUMBER_VALUE(model.materials_count)).as.number, material_prop, prop_value))
+                        error("Invalid cannot edit material");
+                } else
+                    error("Invalid arguments for MAT");
+                if (IS_NIL(see_value(1)))
+                    pop();
+                break;
+            case OP_MLIST:
+                list_materials();
+                break;
+            case OP_SEC:
+                double para_value;
+                section_parameter sec_para;
+                if (IS_NUMBER(see_value(1)) && IS_SEC_PARA(see_value(2))) {
+                    para_value = pop().as.number;
+                    sec_para = pop().as.section_para;
+                } else
+                    error("Invalid arguments for SEC");
+
+                if (IS_NIL(see_value(1)) || IS_NUMBER(see_value(1))) {
+                    if (!set_section_parameter(pop_nil(NUMBER_VALUE(model.sections_count)).as.number, sec_para, para_value))
+                        error("Invalid cannot edit section");
+                } else
+                    error("Invalid arguments for SEC");
+                break;
+            case OP_SLIST:
+                list_sections();
+                break;
             case OP_RETURN:
                 if (vm.stack_top != vm.stack) {
                     print_value(pop());
                     printf("\n");
                 }
                 return INTERPRET_SUCCESS;
+            case OP_BAR:
+                size_t mat_id = model.materials_count - 1;
+                size_t sec_id = model.sections_count - 1;
+                switch (next_nil()) {
+                    case 5:
+                        if (IS_NUMBER(see_value(1))) {
+                            mat_id = pop().as.number;
+                        } else
+                            error("Invalid arguments for BAR");
+                    case 4:
+                        if (IS_NUMBER(see_value(1))) {
+                            sec_id = pop().as.number;
+                        } else
+                            error("Invalid arguments for BAR");
+                    case 2:
+                        if (IS_NUMBER(see_value(1)) && IS_NUMBER(see_value(2))) {
+                            add_bar(pop().as.number, pop().as.number, sec_id, mat_id);
+                        } else
+                            error("Invalid arguments for BAR");
+                        break;
+                    default:
+                        error("Invalid arguments for BAR");
+                        break;
+                }
+                if (IS_NIL(see_value(1)))
+                    pop();
+                break;
+            case OP_ELIST:
+                list_elements();
             default:
                 return INTERPRET_RUNTIME_ERROR;
         }

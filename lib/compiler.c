@@ -133,11 +133,15 @@ static void list() {
     emit_byte(OP_LIST_END);
 }
 
-static void n() {
-    int line = compiler.previous.line;
+static void parse_arguments() {
+    emit_constant(NIL_VALUE);
     do {
         parse_precedence(PREC_ASSIGNMENT);
     } while (compiler.current.type != LEXEME_EOL);
+}
+
+static void n() {
+    parse_arguments();
     emit_byte(OP_N);
 }
 
@@ -150,6 +154,87 @@ static void compile_end() {
 }
 
 static void nothing() {}
+
+static void mat_prop() {
+    switch (compiler.previous.type) {
+        case LEXEME_EX:
+            emit_constant(MAT_PROP_VALUE(EX));
+            break;
+        case LEXEME_EY:
+            emit_constant(MAT_PROP_VALUE(EY));
+            break;
+        case LEXEME_EZ:
+            emit_constant(MAT_PROP_VALUE(EZ));
+            break;
+        default:
+            error("Invalid material property");
+    }
+}
+
+static void mat() {
+    parse_arguments();
+    emit_byte(OP_MAT);
+}
+
+static void sec() {
+    parse_arguments();
+    emit_byte(OP_SEC);
+}
+
+static void mlist() {
+    emit_byte(OP_MLIST);
+}
+
+static void slist() {
+    emit_byte(OP_SLIST);
+}
+
+static void elist() {
+    emit_byte(OP_ELIST);
+}
+
+static void sec_para() {
+    switch (compiler.previous.type) {
+        case LEXEME_A:
+            emit_constant(SEC_PARA_VALUE(SEC));
+            break;
+        default:
+            error("Invalid section parameter");
+    }
+}
+
+static void element() {
+    lexeme_type element_type = compiler.previous.type;
+    parse_arguments();
+    switch (element_type) {
+        case LEXEME_BAR:
+            emit_byte(OP_BAR);
+            break;
+    }
+}
+
+static void dir() {
+    switch (compiler.previous.type) {
+        case LEXEME_UX:
+            emit_constant(DIR_VALUE(UX));
+            break;
+        case LEXEME_UY:
+            emit_constant(DIR_VALUE(UY));
+            break;
+        case LEXEME_UZ:
+            emit_constant(DIR_VALUE(UZ));
+            break;
+        case LEXEME_RX:
+            emit_constant(DIR_VALUE(RX));
+            break;
+        case LEXEME_RY:
+            emit_constant(DIR_VALUE(RY));
+            break;
+        case LEXEME_RZ:
+            emit_constant(DIR_VALUE(RZ));
+            break;
+    }
+}
 
 parse_rule parse_rules[] = {
     [LEXEME_N] = {n, NULL, PREC_NONE},
@@ -166,6 +251,22 @@ parse_rule parse_rules[] = {
     [LEXEME_ERROR] = {NULL, NULL, PREC_NONE},
     [LEXEME_EOL] = {nothing, NULL, PREC_NONE},
     [LEXEME_EOF] = {NULL, NULL, PREC_NONE},
+    [LEXEME_MAT] = {mat, NULL, PREC_NONE},
+    [LEXEME_MLIST] = {mlist, NULL, PREC_NONE},
+    [LEXEME_SEC] = {sec, NULL, PREC_NONE},
+    [LEXEME_SLIST] = {slist, NULL, PREC_NONE},
+    [LEXEME_EX] = {mat_prop, NULL, PREC_NONE},
+    [LEXEME_EY] = {mat_prop, NULL, PREC_NONE},
+    [LEXEME_EZ] = {mat_prop, NULL, PREC_NONE},
+    [LEXEME_A] = {sec_para, NULL, PREC_NONE},
+    [LEXEME_BAR] = {element, NULL, PREC_NONE},
+    [LEXEME_ELIST] = {elist, NULL, PREC_NONE},
+    [LEXEME_UX] = {dir, NULL, PREC_NONE},
+    [LEXEME_UY] = {dir, NULL, PREC_NONE},
+    [LEXEME_UZ] = {dir, NULL, PREC_NONE},
+    [LEXEME_RX] = {dir, NULL, PREC_NONE},
+    [LEXEME_RY] = {dir, NULL, PREC_NONE},
+    [LEXEME_RZ] = {dir, NULL, PREC_NONE},
 };
 
 static parse_rule* get_parse_rule(lexeme_type lex_type) {
