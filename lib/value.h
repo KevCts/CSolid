@@ -49,6 +49,7 @@ typedef struct {
 #define IS_OBJ(val) ((val).type == TYPE_OBJECT)
 
 value_array* new_value_array();
+void reinit_value_array(value_array* pointer);
 void free_value_array(value_array* array);
 size_t add_value_to_array(value val, value_array* array);
 void print_value(value val);

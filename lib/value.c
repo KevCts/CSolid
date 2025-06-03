@@ -12,6 +12,13 @@ value_array* new_value_array() {
     return result;
 }
 
+void reinit_value_array(value_array* pointer) {
+    pointer->count = 0;
+    pointer->capacity = 0;
+    FREE(pointer->values);
+    pointer->values = NULL;
+}
+
 void free_value_array(value_array* array) {
     FREE(array->values);
     FREE(array);

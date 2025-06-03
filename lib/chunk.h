@@ -23,6 +23,7 @@ typedef enum {
     OP_MULTIPLY,
     OP_DIVIDE,
     OP_RETURN,
+    OP_BOUND,
 } op_code;
 
 typedef struct {

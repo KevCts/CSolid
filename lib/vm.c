@@ -4,6 +4,7 @@
 #include "csolid/element.h"
 #include "csolid/elements/bar.h"
 #include "csolid/material.h"
+#include "csolid/node.h"
 #include "csolid/section.h"
 #include "value.h"
 #include "object.h"
@@ -50,10 +51,6 @@ static value see_value(int i) {
 }
 
 
-static value see_next_next_value() {
-    return *(vm.stack_top - 2);
-}
-
 static value pop_nil(value value_if_nil) {
     value val = pop();
 
@@ -61,15 +58,27 @@ static value pop_nil(value value_if_nil) {
     return IS_NIL(val) ? value_if_nil : val;
 }
 
-static int next_nil() {
-    int res = 0;
-    while (!IS_NIL(see_value(++res))) {}
-    return res;
+static bool arguments_match(int argc, value_type expected_types[], value_array* arr_to_fill){
+    for (int i = argc; i >=1; i--) {
+        if (see_value(i).type != expected_types[argc - i])
+            return false;
+    }
+    if (IS_NIL(see_value(argc + 1))) {
+            for (int i = 0; i < argc; i++)
+                add_value_to_array(NIL_VALUE, arr_to_fill);
+            for (int i = 0; i < argc; i++)
+                arr_to_fill->values[argc - i - 1] = pop();
+            pop();
+    } else
+        return false;
+    return true;
 }
 
 static interpret_result run(){
     for (;;) {
         uint8_t instruction = READ_OP_CODE();
+
+        value_array* arguments = new_value_array();
 
         switch (instruction) {
             case OP_CONSTANT:
@@ -105,13 +114,8 @@ static interpret_result run(){
                 push(OBJ_VALUE((obj*)list));
                 break;
             case OP_N:
-                if (IS_NUMBER(see_value(1)) && IS_NUMBER(see_value(2)) && IS_NUMBER(see_value(3))) {
-                    double x, y, z;
-                    z = pop().as.number;
-                    y = pop().as.number;
-                    x = pop().as.number;
-                    pop();
-                    add_node(x, y, z);
+                if (arguments_match(3, (value_type[]) {TYPE_NUMBER, TYPE_MAT_PROP, TYPE_NUMBER}, arguments)) {
+                    add_node(arguments->values[0].as.number, arguments->values[1].as.number, arguments->values[2].as.number);
                 } else {
                     error("Invalid arguments for N");
                 }
@@ -120,21 +124,14 @@ static interpret_result run(){
                 list_nodes();
                 break;
             case OP_MAT:
-                double prop_value;
-                material_caracteristics material_prop;
-                if (IS_NUMBER(see_value(1)) && IS_MAT_PROP(see_value(2))) {
-                    prop_value = pop().as.number;
-                    material_prop = pop().as.material_prop;
-                } else
-                    error("Invalid arguments for MAT");
-
-                if (IS_NIL(see_value(1)) || IS_NUMBER(see_value(1))) {
-                    if (!set_material_caracteristic(pop_nil(NUMBER_VALUE(model.materials_count)).as.number, material_prop, prop_value))
-                        error("Invalid cannot edit material");
-                } else
-                    error("Invalid arguments for MAT");
-                if (IS_NIL(see_value(1)))
-                    pop();
+                    if (arguments_match(3, (value_type[]) {TYPE_NUMBER, TYPE_MAT_PROP, TYPE_NUMBER}, arguments)) {
+                        if (!set_material_caracteristic(arguments->values[0].as.number, arguments->values[1].as.material_prop, arguments->values[2].as.number))
+                            error("Cannot edit material, material id might not exist or system might not be able to add a material");
+                    } else if (arguments_match(2, (value_type[]) {TYPE_MAT_PROP, TYPE_NUMBER}, arguments)) {
+                        if (!set_material_caracteristic(model.materials_count, arguments->values[0].as.material_prop, arguments->values[1].as.number))
+                            error("Cannot create material");
+                    } else
+                        error("Invalid arguments for MAT");
                 break;
             case OP_MLIST:
                 list_materials();
@@ -163,7 +160,7 @@ static interpret_result run(){
                     printf("\n");
                 }
                 return INTERPRET_SUCCESS;
-            case OP_BAR:
+            /* case OP_BAR:
                 size_t mat_id = model.materials_count - 1;
                 size_t sec_id = model.sections_count - 1;
                 switch (next_nil()) {
@@ -192,9 +189,20 @@ static interpret_result run(){
                 break;
             case OP_ELIST:
                 list_elements();
+                break;
+            case OP_BOUND:
+                double disp = IS_NUMBER(see_value(1)) ? pop().as.number : 0;
+                if (IS_DIR(see_value(1))) {
+                    direction d = pop().as.dir;
+                    if (IS_NUMBER(see_value(1)))
+                        add_boundary(pop().as.number, d, disp);
+                } else
+                    error("Invalid arguments for BOUND");
+                break;*/
             default:
                 return INTERPRET_RUNTIME_ERROR;
         }
+        free_value_array(arguments);
     }
 }
 

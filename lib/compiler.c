@@ -236,6 +236,11 @@ static void dir() {
     }
 }
 
+static void bound() {
+    parse_arguments();
+    emit_byte(OP_BOUND);
+}
+
 parse_rule parse_rules[] = {
     [LEXEME_N] = {n, NULL, PREC_NONE},
     [LEXEME_NLIST] = {nlist, NULL, PREC_NONE},
@@ -267,6 +272,7 @@ parse_rule parse_rules[] = {
     [LEXEME_RX] = {dir, NULL, PREC_NONE},
     [LEXEME_RY] = {dir, NULL, PREC_NONE},
     [LEXEME_RZ] = {dir, NULL, PREC_NONE},
+    [LEXEME_BOUND] = {bound, NULL, PREC_NONE},
 };
 
 static parse_rule* get_parse_rule(lexeme_type lex_type) {

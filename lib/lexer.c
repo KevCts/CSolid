@@ -125,7 +125,14 @@ static lexeme_type litteral_type() {
         case 'a':
             return keyword(1, 0, "", LEXEME_A);
         case 'b':
-            return keyword(1, 2, "ar", LEXEME_BAR);
+            if (lexer.current - lexer.start >  1) {
+                switch (tolower(lexer.start[1])) {
+                    case 'a':
+                        return keyword(2, 1, "r", LEXEME_BAR);
+                    case 'o':
+                        return keyword(2,3,"und", LEXEME_BOUND);
+                }
+            }
         case 'e':
             if (lexer.current - lexer.start >  1) {
                 switch (tolower(lexer.start[1])) {
