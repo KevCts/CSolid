@@ -204,6 +204,9 @@ static interpret_result run(){
                 else
                     error("Invalid arguments for BOUND");
                 break;
+            case OP_BLIST:
+                list_boundaries();
+                break;
             case OP_FORCE:
                 if (arguments_match(3, (value_type[]) {TYPE_NUMBER, TYPE_DIR, TYPE_NUMBER}, arguments))
                     set_force(arguments->values[0].as.number, arguments->values[1].as.dir, arguments->values[2].as.number);
