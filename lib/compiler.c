@@ -1,5 +1,6 @@
 #include "compiler.h"
 #include "chunk.h"
+#include "csolid/node.h"
 #include "lexer.h"
 #include "value.h"
 #include <stdint.h>
@@ -210,6 +211,8 @@ static void element() {
         case LEXEME_BAR:
             emit_byte(OP_BAR);
             break;
+        default:
+            break;
     }
 }
 
@@ -233,12 +236,39 @@ static void dir() {
         case LEXEME_RZ:
             emit_constant(DIR_VALUE(RZ));
             break;
+        default:
+            break;
     }
 }
 
 static void bound() {
     parse_arguments();
     emit_byte(OP_BOUND);
+}
+
+static void blist() {
+    emit_byte(OP_BLIST);
+}
+
+static void solve() {
+    emit_byte(OP_SOLVE);
+}
+
+static void lreac() {
+    emit_byte(OP_LREAC);
+}
+
+static void ldisp() {
+    emit_byte(OP_LDISP);
+}
+
+static void force(){
+    parse_arguments();
+    emit_byte(OP_FORCE);
+}
+
+static void flist() {
+    emit_byte(OP_FLIST);
 }
 
 parse_rule parse_rules[] = {
@@ -273,6 +303,12 @@ parse_rule parse_rules[] = {
     [LEXEME_RY] = {dir, NULL, PREC_NONE},
     [LEXEME_RZ] = {dir, NULL, PREC_NONE},
     [LEXEME_BOUND] = {bound, NULL, PREC_NONE},
+    [LEXEME_BLIST] = {blist, NULL, PREC_NONE},
+    [LEXEME_SOLVE] = {solve, NULL, PREC_NONE},
+    [LEXEME_LREAC] = {lreac, NULL, PREC_NONE},
+    [LEXEME_LDISP] = {ldisp, NULL, PREC_NONE},
+    [LEXEME_FORCE] = {force, NULL, PREC_NONE},
+    [LEXEME_FLIST] = {flist, NULL, PREC_NONE},
 };
 
 static parse_rule* get_parse_rule(lexeme_type lex_type) {
@@ -322,8 +358,9 @@ bool compile(const char* source, chunk* code) {
     compiler.had_error = false;
     compiler.panic_mode = false;
 
+    parse_next_lexeme();
+
     do {
-        parse_next_lexeme();
         if (compiler.current.type != LEXEME_EOF)
             build_op_code();
     } while (compiler.current.type != LEXEME_EOF);

@@ -1,6 +1,7 @@
 #include "vm.h"
 #include "chunk.h"
 #include "compiler.h"
+#include "csolid/cvide/coomat.h"
 #include "csolid/element.h"
 #include "csolid/elements/bar.h"
 #include "csolid/material.h"
@@ -110,9 +111,14 @@ static interpret_result run(){
                 push(NIL_VALUE);
                 break;
             case OP_LIST_END:
-                obj_list* list = (obj_list*)new_list();
-                while (!IS_NIL(see_value(1)))
+                push(OBJ_VALUE(new_list()));
+                while (!IS_NIL(see_value(2))) {
+                    obj_list* list = (obj_list*)pop().as.object;
                     list_append(list, pop()); 
+                    push(OBJ_VALUE((obj*)list));
+                }
+                obj_list* list = (obj_list*)pop().as.object;
+                pop();
                 push(OBJ_VALUE((obj*)list));
                 break;
             case OP_N:
@@ -170,13 +176,56 @@ static interpret_result run(){
             case OP_BOUND:
                 if (arguments_match(3, (value_type[]) {TYPE_NUMBER, TYPE_DIR, TYPE_NUMBER}, arguments))
                     set_boundary(arguments->values[0].as.number, arguments->values[1].as.dir, arguments->values[2].as.number);
-                if (arguments_match(2, (value_type[]) {TYPE_NUMBER, TYPE_DIR}, arguments))
+                else if (arguments_match(2, (value_type[]) {TYPE_NUMBER, TYPE_DIR}, arguments))
                     set_boundary(arguments->values[0].as.number, arguments->values[1].as.dir, 0);
+                else if (arguments_match(2, (value_type[]){TYPE_NUMBER, TYPE_OBJECT}, arguments)){
+                    if (arguments->values[1].as.object->type == OBJ_LIST) {
+                        obj_list* list = (obj_list*)arguments->values[1].as.object;
+                        for (int i = 0; i < list->size; i++) {
+                            set_boundary(arguments->values[0].as.number, list->list->values[i].as.dir, 0);
+                        }
+                    } else
+                        error("Invalid arguments for BOUND");
+                }
+                else if (arguments_match(1, (value_type[]){TYPE_OBJECT}, arguments)){
+                    if (arguments->values[0].as.object->type == OBJ_LIST) {
+                        obj_list* list = (obj_list*)arguments->values[0].as.object;
+                        for (int i = 0; i < list->size; i++) {
+                            for (int j = 0; j < 6; j++)
+                                set_boundary(list->list->values[i].as.number, j, 0);
+                        }
+                    } else
+                        error("Invalid arguments for BOUND");
+                }
+                else if (arguments_match(1, (value_type[]) {TYPE_NUMBER}, arguments)) {
+                    for (int j = 0; j < 6; j++)
+                        set_boundary(arguments->values[0].as.number, j, 0);
+                }
                 else
                     error("Invalid arguments for BOUND");
                 break;
+            case OP_FORCE:
+                if (arguments_match(3, (value_type[]) {TYPE_NUMBER, TYPE_DIR, TYPE_NUMBER}, arguments))
+                    set_force(arguments->values[0].as.number, arguments->values[1].as.dir, arguments->values[2].as.number);
+                else
+                    error("Invalid arguments for FORCE");
+                break;
+            case OP_SOLVE:
+                solve();
+                break;
+            case OP_LDISP:
+                print_coomat(coomat_from_array(6 * model.nodes_count, 1, model.displacements));
+                printf("\n");
+                break;
+            case OP_LREAC:
+                print_coomat(coomat_from_array(6 * model.nodes_count, 1, model.reactions));
+                printf("\n");
+                break;
             case OP_ELIST:
                 list_elements();
+                break;
+            case OP_FLIST:
+                list_forces();
                 break;
             default:
                 return INTERPRET_RUNTIME_ERROR;

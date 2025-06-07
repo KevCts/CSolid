@@ -129,6 +129,8 @@ static lexeme_type litteral_type() {
                 switch (tolower(lexer.start[1])) {
                     case 'a':
                         return keyword(2, 1, "r", LEXEME_BAR);
+                    case 'l':
+                        return keyword(2, 3, "ist", LEXEME_BLIST);
                     case 'o':
                         return keyword(2,3,"und", LEXEME_BOUND);
                 }
@@ -144,6 +146,24 @@ static lexeme_type litteral_type() {
                         return keyword(2, 0, "", LEXEME_EY);
                     case 'z':
                         return keyword(2, 0, "", LEXEME_EZ);
+                }
+            }
+        case 'f':
+            if (lexer.current - lexer.start >  1) {
+                switch (tolower(lexer.start[1])) {
+                    case 'l':
+                        return keyword(2, 3,"ist", LEXEME_FLIST);
+                    case 'o':
+                        return keyword(2, 3,"rce", LEXEME_FORCE);
+                }
+            }
+        case 'l':
+            if (lexer.current - lexer.start >1) {
+                switch (tolower(lexer.start[1])) {
+                    case 'd':
+                        return keyword(2, 3, "isp", LEXEME_LDISP);
+                    case 'r':
+                        return keyword(2, 3, "eac", LEXEME_LREAC);
                 }
             }
         case 'm':
@@ -183,6 +203,8 @@ static lexeme_type litteral_type() {
                         return keyword(2, 1, "c", LEXEME_SEC);
                     case 'l':
                         return keyword(2, 3, "ist", LEXEME_SLIST);
+                    case 'o':
+                        return keyword(2, 3, "lve", LEXEME_SOLVE);
                 }
             }
         case 'u':

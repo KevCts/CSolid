@@ -24,6 +24,12 @@ typedef enum {
     OP_DIVIDE,
     OP_RETURN,
     OP_BOUND,
+    OP_BLIST,
+    OP_SOLVE,
+    OP_LREAC,
+    OP_LDISP,
+    OP_FORCE,
+    OP_FLIST,
 } op_code;
 
 typedef struct {

@@ -56,5 +56,34 @@ void print_value(value val) {
                     printf("EZ");
                     break;
             }
+            break;
+        case TYPE_DIR:
+            switch (val.as.dir) {
+                case UX:
+                    printf("UX");
+                    break;
+                case UY:
+                    printf("UY");
+                    break;
+                case UZ:
+                    printf("UZ");
+                    break;
+                case RX:
+                    printf("RX");
+                    break;
+                case RY:
+                    printf("RY");
+                    break;
+                case RZ:
+                    printf("RZ");
+                    break;
+            }
+            break;
+        case TYPE_SEC_PARA:
+            switch (val.as.section_para) {
+                case SEC:
+                    printf("A");
+                    break;
+            }
     }
 }
